@@ -7,12 +7,12 @@ using System.IO;
 
 public class webReqApi : MonoBehaviour
 {
-    public string PathToFile = "file name here";
-
+    public string FileName = "file name here";
+    private string PathToFile;
 
     void Start()
     {
-        PathToFile = Application.streamingAssetsPath + "/" + PathToFile;
+        PathToFile = Application.streamingAssetsPath + "/" + FileName;
         StartCoroutine(GetRequest("http://127.0.0.1:5000/unity", PathToFile));
     }
 
@@ -24,7 +24,7 @@ public class webReqApi : MonoBehaviour
 
         WWWForm form = new WWWForm();
 
-        form.AddField("name", "matan");
+        form.AddField("name", "nameOfSubject");
         form.AddField("frameCount", Time.frameCount.ToString());
         form.AddBinaryData("dataFile", dataFile.downloadHandler.data, Path.GetFileName(path));
 
