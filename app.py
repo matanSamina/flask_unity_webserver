@@ -1,4 +1,9 @@
 import base64
+import os
+import uuid
+import io
+from werkzeug.utils import secure_filename
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
@@ -6,6 +11,7 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
+app.config["UPLOAD_FOLDER"] = "static/uploads/"
 
 @app.route("/")
 def index():
@@ -17,13 +23,16 @@ def unity():
     if request.method == "POST":
         form = request.form
         # FileStorage object wrapper
-        file = request.files["fileUpload"]
+        print(request.files)
+        file = request.files['dataFile']
         if file:
-            image_string = base64.b64encode(file.read())
-            print(image_string.decode('utf-8'))
-
-        print(form["name"])
-        return "Accepted"
+            #text_content = file.read()
+            filename = secure_filename(file.filename)
+            file.save(app.config['UPLOAD_FOLDER'] + filename)
+            return "File Accepted"
+        else:
+            print(form["name"])
+            return "Accepted"
     else:
         return "None"
 
