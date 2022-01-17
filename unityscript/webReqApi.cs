@@ -7,17 +7,18 @@ using System.IO;
 
 public class webReqApi : MonoBehaviour
 {
+    public string PathToFile = "file name here";
+
 
     void Start()
     {
-        StartCoroutine(GetRequest("http://127.0.0.1:5000/unity"));
+        PathToFile = Application.streamingAssetsPath + "/" + PathToFile;
+        StartCoroutine(GetRequest("http://127.0.0.1:5000/unity", PathToFile));
     }
 
-    IEnumerator GetRequest(string uri)
+    IEnumerator GetRequest(string uri, string path)
     {
 
-        // path to file
-        string path = Application.streamingAssetsPath + "/data.txt";
         UnityWebRequest dataFile = UnityWebRequest.Get(path);
         yield return dataFile.SendWebRequest();
 
@@ -25,7 +26,6 @@ public class webReqApi : MonoBehaviour
 
         form.AddField("name", "matan");
         form.AddField("frameCount", Time.frameCount.ToString());
-        form.AddBinaryData("fileUpload", bytes, "screenShot.png", "image/png");
         form.AddBinaryData("dataFile", dataFile.downloadHandler.data, Path.GetFileName(path));
 
         using (UnityWebRequest www = UnityWebRequest.Post(uri, form))
