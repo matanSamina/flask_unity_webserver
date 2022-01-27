@@ -5,9 +5,10 @@ import io
 
 from werkzeug.utils import secure_filename
 import matplotlib.pyplot as plt
-
+from os.path import basename
 from flask import Flask, request, render_template, send_from_directory
 
+from zipfile import ZipFile
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "static/uploads/"
@@ -52,9 +53,10 @@ def download(filename):
 
 def make_tree(path):
     tree = dict(name=os.path.basename(path), children=[])
-    try: lst = os.listdir(path)
+    try:
+        lst = os.listdir(path)
     except OSError:
-        pass# ignore errors
+        pass  # ignore errors
     else:
         for name in lst:
             fn = os.path.join(path, name)
@@ -67,5 +69,18 @@ def make_tree(path):
     return tree
 
 
+# create a ZipFile object
+@app.route('/downloadzip/<path:filename>', methods=['GET', 'POST'])
+def downloadzip(path):
+    with ZipFile('sampleDir.zip', 'w') as zipObj:
+        # Iterate over all the files in directory
+        for folderName, subfolders, filenames in os.walk(path):
+            for filename in filenames:
+                # create complete filepath of file in directory
+                filePath = os.path.join(folderName, filename)
+                # Add file to zip
+                zipObj.write(filePath, basename(filePath))
+
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=False)
