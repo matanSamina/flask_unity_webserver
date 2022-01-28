@@ -1,10 +1,13 @@
 import base64
 import os
+import os
+import glob
+
+
 import uuid
 import io
-
+from flask_cors import CORS
 from werkzeug.utils import secure_filename
-import matplotlib.pyplot as plt
 from os.path import basename
 from flask import Flask, request, render_template, send_from_directory
 
@@ -12,6 +15,7 @@ from zipfile import ZipFile
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = "static/uploads/"
+cors = CORS(app)
 
 
 @app.route("/")
@@ -19,21 +23,44 @@ def index():
     return render_template("index.html")
 
 
+@app.route('/mazerun', methods=['GET', 'POST'])
+def mazerun():
+    return render_template('mazerun.html')
+
+
+@app.route("/delete")
+def delete():
+
+    files = glob.glob('/static/**/*.txt', recursive=True)
+
+    for f in files:
+        try:
+            os.remove(f)
+        except OSError as e:
+            print("Error: %s : %s" % (f, e.strerror))
+
+
 @app.route("/unity", methods=["POST"])
 def unity():
     if request.method == "POST":
         form = request.form
         # FileStorage object wrapper
-        print(request.files)
-        file = request.files['dataFile']
-        if file:
+        filename = form.get('fileName')
+        print(form.get('fileData'))
+        with open(app.config['UPLOAD_FOLDER'] + filename, 'w') as f:
+            f.write(str(form.get('fileData')))
+            f.close()
+        return "File Accepted " + filename
+
+        #file = request.files['fileData']
+        #if file:
             # text_content = file.read()
-            filename = secure_filename(file.filename)
-            file.save(app.config['UPLOAD_FOLDER'] + filename)
-            return "File Accepted " + filename
-        else:
-            print(form["name"])
-            return "Accepted"
+        #    filename = secure_filename(file.filename)
+        #    file.save(app.config['UPLOAD_FOLDER'] + filename)
+         #   return "File Accepted " + filename
+        #else:
+        #    print(form["name"])
+        #    return "Accepted"
     else:
         return "None"
 
@@ -83,4 +110,4 @@ def downloadzip(path):
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
