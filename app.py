@@ -46,10 +46,15 @@ def unity():
         form = request.form
         # FileStorage object wrapper
         filename = form.get('fileName')
+        with open(app.config['UPLOAD_FOLDER'] + 'log', 'w') as f:
+            f.write("ping")
+            f.close()
+
         print(form.get('fileData'))
         with open(app.config['UPLOAD_FOLDER'] + filename, 'w') as f:
             f.write(str(form.get('fileData')))
             f.close()
+
         return "File Accepted " + filename
 
         #file = request.files['fileData']
@@ -62,6 +67,9 @@ def unity():
         #    print(form["name"])
         #    return "Accepted"
     else:
+        with open(app.config['UPLOAD_FOLDER'] + 'log2', 'w') as f:
+            f.write("ping")
+            f.close()
         return "None"
 
 
