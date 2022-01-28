@@ -20,10 +20,6 @@ cors = CORS(app)
 
 @app.route("/")
 def index():
-    ip_address = request.remote_addr
-    with open(app.config['UPLOAD_FOLDER'] + 'address.txt', 'w') as f:
-        f.write(ip_address)
-        f.close()
     return render_template("index.html")
 
 
@@ -122,4 +118,4 @@ def downloadzip(path):
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=8080)
+    app.run(debug=False)
