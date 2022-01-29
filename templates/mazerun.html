@@ -65,5 +65,62 @@
       };
       document.body.appendChild(script);
     </script>
+
+
+    <div class="centered">
+      <h2>Message from Unity</h2>
+      <p id="lblMessage">...</p>
+    </div>
+
+    <script>
+     // Function which receives a message from Unity
+     function receiveMessageFromUnity(txt) {
+        // Get element to assign the message
+        const lblMessage = document.getElementById("lblMessage");
+        // Assign received from Unity message
+        lblMessage.innerText = txt;
+
+        var form = document.createElement("form");
+        var element1 = document.createElement("input");
+        var element2 = document.createElement("input");
+
+        form.method = "POST";
+        form.action = "  https://unitytry.herokuapp.com/unity";
+        crossorigin="use-credentials"
+
+        element1.value="matan";
+        element1.name="fileName";
+        form.appendChild(element1);
+
+        element2.value=txt;
+        element2.name="data";
+        form.appendChild(element2);
+
+        document.body.appendChild(form);
+
+        //form.submit();
+
+        Email.send({
+          Host : "smtp.sendgrid.net",
+          Port : 587,
+          Username : "apikey",
+          Password : "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",
+          To : 'saminam@post.bgu.ac.il',
+          From : "saminam@post.bgu.ac.il",
+          Subject : "This is the subject",
+          Body : txt //,
+          //	Attachments : [
+         //     {
+          //        name : "log.txt",
+         //         path : "/Users/joe/test.txt'"
+         //     }]
+          }).then(
+          message => alert(message)
+        );
+     }
+     </script>
+
+     <script src="https://smtpjs.com/v3/smtp.js"></script>
+
   </body>
 {% endblock %}
