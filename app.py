@@ -140,21 +140,10 @@ def upload_file():
                 f.write(str(request.form.get('data')))
                 f.close()
 
-            auth = GoogleAuth()
-            drive = GoogleDrive(auth)
-            client_json_path = 'static/client_secrets.json'
-            GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = client_json_path
-
-            fileToDrive = app.config['UPLOAD_FOLDER'] + filename
-            file = drive.CreateFile({'parents': [{'id': "1oNuqmcxNPctnHNC_BjgJnoXM8p2Ykuqz"}]})
-            # Read file and set it as the content of this instance.
-            file.SetContentFile(fileToDrive)
-            file.Upload()  # Upload the file.
-
             return '''
             <!doctype html>
-            <title>GAME COMPLETED</title>
-            <h1>THANKS YOU!</h1>
+            <title>Upload new File</title>
+            <h1>File Uploaded Successfully</h1>
             '''
 
         if 'file' in request.files:
