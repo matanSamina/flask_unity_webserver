@@ -10,6 +10,8 @@ from werkzeug.utils import secure_filename
 from pydrive.auth import GoogleAuth
 from pydrive.drive import GoogleDrive
 
+import time
+
 app = Flask(__name__)
 UPLOAD_FOLDER = "static/uploads/"
 ALLOWED_EXTENSIONS = {'txt', 'json'}
@@ -132,9 +134,10 @@ def upload_file():
             return redirect(request.url)
 
         if 'data' in request.form:
-            filename = request.form.get('fileName') + ".txt"
+            now = time.strftime("%Y%m%d_%H%M%S")
+            filename = request.form.get('fileName') + now + ".txt"
             with open(app.config['UPLOAD_FOLDER'] + filename, 'w') as f:
-                f.write(str(request.form.get('fileData')))
+                f.write(str(request.form.get('data')))
                 f.close()
             return '''
             <!doctype html>
