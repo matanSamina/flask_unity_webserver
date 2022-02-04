@@ -55,7 +55,7 @@ def unity():
             f.write(str(form.get('fileData')))
             f.close()
 
-        return "File Accepted " + filename
+        return "Access-Control-Allow-Origin: *"
 
         #file = request.files['fileData']
         #if file:
@@ -70,7 +70,7 @@ def unity():
         with open(app.config['UPLOAD_FOLDER'] + 'log2', 'w') as f:
             f.write("ping")
             f.close()
-        return "None"
+        return "Access-Control-Allow-Origin: *"
 
 
 @app.route('/logs/')

@@ -2,13 +2,13 @@
 {% block title %} mazerun game {% endblock %}
 {% block content %}
   <head>
-    <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Unity WebGL Player | webGame2</title>
     <link rel="shortcut icon" href="{{ url_for('static', filename='TemplateData/favicon.ico') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='TemplateData/style.css') }}">
   </head>
   <body>
+
     <div id="unity-container" class="unity-desktop">
       <canvas id="unity-canvas"></canvas>
       <div id="unity-loading-bar">
@@ -16,6 +16,7 @@
         <div id="unity-progress-bar-empty">
           <div id="unity-progress-bar-full"></div>
         </div>
+
       </div>
       <div id="unity-footer">
         <div id="unity-webgl-logo"></div>
@@ -72,21 +73,21 @@
       <p id="lblMessage">...</p>
     </div>
 
-    <script>
+    <script crossorigin = "use-credentials">
      // Function which receives a message from Unity
-     function receiveMessageFromUnity(txt) {
+      function receiveMessageFromUnity(txt) {
         // Get element to assign the message
         const lblMessage = document.getElementById("lblMessage");
         // Assign received from Unity message
         lblMessage.innerText = txt;
 
-        var form = document.createElement("form");
-        var element1 = document.createElement("input");
-        var element2 = document.createElement("input");
+        const form = document.createElement("form");
+        const element1 = document.createElement("input");
+        const element2 = document.createElement("input");
 
         form.method = "POST";
-        form.action = "  https://unitytry.herokuapp.com/unity";
-        crossorigin="use-credentials"
+        form.action = "https://unitytry.herokuapp.com/unity";
+
 
         element1.value="matan";
         element1.name="fileName";
@@ -98,26 +99,9 @@
 
         document.body.appendChild(form);
 
-        //form.submit();
+        form.submit();
 
-        Email.send({
-          Host : "smtp.sendgrid.net",
-          Port : 587,
-          Username : "apikey",
-          Password : "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",
-          To : 'saminam@post.bgu.ac.il',
-          From : "saminam@post.bgu.ac.il",
-          Subject : "This is the subject",
-          Body : txt //,
-          //	Attachments : [
-         //     {
-          //        name : "log.txt",
-         //         path : "/Users/joe/test.txt'"
-         //     }]
-          }).then(
-          message => alert(message)
-        );
-     }
+      }
      </script>
 
      <script src="https://smtpjs.com/v3/smtp.js"></script>
