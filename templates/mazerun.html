@@ -86,8 +86,7 @@
         const element2 = document.createElement("input");
 
         form.method = "POST";
-        form.action = "{{url_for('unity')}}";
-
+        form.action = "{{url_for('upload_file')}}";
 
         element1.value="matan";
         element1.name="fileName";
@@ -103,8 +102,6 @@
 
       }
      </script>
-
-     <script src="https://smtpjs.com/v3/smtp.js"></script>
 
   </body>
 {% endblock %}

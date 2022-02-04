@@ -126,24 +126,37 @@ def allowed_file(filename):
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        # check if the post request has the file part
-        if 'file' not in request.files:
+        # check if the post request has the file part or form
+        if 'file' not in request.files and not request.form:
             flash('No file part')
             return redirect(request.url)
-        file = request.files['file']
-        # If the user does not select a file, the browser submits an
-        # empty file without a filename.
-        if file.filename == '':
-            flash('No selected file')
-            return redirect(request.url)
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join('static/', filename))
+
+        if 'data' in request.form:
+            filename = request.form.get('fileName') + ".txt"
+            with open(app.config['UPLOAD_FOLDER'] + filename, 'w') as f:
+                f.write(str(request.form.get('fileData')))
+                f.close()
             return '''
             <!doctype html>
             <title>Upload new File</title>
             <h1>File Uploaded Successfully</h1>
             '''
+
+        if 'file' in request.files:
+            file = request.files['file']
+            # If the user does not select a file, the browser submits an
+            # empty file without a filename.
+            if file.filename == '':
+                flash('No selected file')
+                return redirect(request.url)
+            if file and allowed_file(file.filename):
+                filename = secure_filename(file.filename)
+                file.save(os.path.join('static/', filename))
+                return '''
+                <!doctype html>
+                <title>Upload new File</title>
+                <h1>File Uploaded Successfully</h1>
+                '''
     return '''
     <!doctype html>
     <title>Upload new File</title>
