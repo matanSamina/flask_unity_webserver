@@ -3,7 +3,6 @@ import os
 import os
 import glob
 
-
 import uuid
 import io
 from flask_cors import CORS
@@ -30,7 +29,6 @@ def mazerun():
 
 @app.route("/delete")
 def delete():
-
     files = glob.glob('/static/**/*.txt', recursive=True)
 
     for f in files:
@@ -57,15 +55,17 @@ def unity():
 
         return "Access-Control-Allow-Origin: *"
 
-        #file = request.files['fileData']
-        #if file:
-            # text_content = file.read()
+        # file = request.files['fileData']
+        # if file:
+        # text_content = file.read()
         #    filename = secure_filename(file.filename)
         #    file.save(app.config['UPLOAD_FOLDER'] + filename)
-         #   return "File Accepted " + filename
-        #else:
+        #   return "File Accepted " + filename
+        # else:
         #    print(form["name"])
         #    return "Accepted"
+
+
     else:
         with open(app.config['UPLOAD_FOLDER'] + 'log2', 'w') as f:
             f.write("ping")
