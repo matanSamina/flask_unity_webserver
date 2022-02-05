@@ -21,12 +21,12 @@ cors = CORS(app)
 
 @app.route("/")
 def index():
-    return render_template("index.html")
+    return render_template("index.html", page_name="Unity API")
 
 
 @app.route('/mazerun', methods=['GET', 'POST'])
 def mazerun():
-    return render_template('mazerun.html')
+    return render_template('mazerun.html', page_name="mazerun")
 
 
 @app.route("/delete")
@@ -78,7 +78,7 @@ def unity():
 
 @app.route('/logs/')
 def logs():
-    return render_template('logs.html', tree=make_tree("static/uploads/"))
+    return render_template('logs.html', tree=make_tree("static/uploads/"), page_name="LOGS")
 
 
 @app.route('/download/<path:filename>', methods=['GET', 'POST'])
@@ -125,6 +125,21 @@ def allowed_file(filename):
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
+def drive_upload(filename):
+
+    auth = GoogleAuth()
+    drive = GoogleDrive(auth)
+    client_json_path = 'static/client_secret.json'
+    GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = client_json_path
+
+    fileToDrive = app.config['UPLOAD_FOLDER'] + filename
+    print(fileToDrive)
+    file = drive.CreateFile({'parents': [{'id': "1oNuqmcxNPctnHNC_BjgJnoXM8p2Ykuqz"}]})
+    # Read file and set it as the content of this instance.
+    file.SetContentFile(fileToDrive)
+    file.Upload()  # Upload the file.
+
+
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
@@ -140,6 +155,7 @@ def upload_file():
                 f.write(str(request.form.get('data')))
                 f.close()
 
+            drive_upload(filename)
             return '''
             <!doctype html>
             <title>Upload new File</title>
