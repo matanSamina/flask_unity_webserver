@@ -100,11 +100,15 @@ def allowed_file(filename):
 
 
 def s3_upload_files(f, bucket_name, filename):
-
+    # Creating Session With Boto3.
+    session = boto3.Session(
+        aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+        aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY')
+    )
     S3_BUCKET = os.environ.get('S3_BUCKET')
-    s3 = boto3.client('s3')
+    # s3 = boto3.client('s3')
     # Creating S3 Resource From the Session.
-    # s3 = session.resource('s3')
+    s3 = session.resource('s3')
 
     result = s3.meta.client.put_object(Body=f, Bucket=S3_BUCKET, Key=filename)
 
