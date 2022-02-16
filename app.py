@@ -126,17 +126,9 @@ def allowed_file(filename):
 
 
 def drive_upload(filename):
-    # auth = GoogleAuth()
-    # drive = GoogleDrive(auth)
+
     client_json_path = 'static/client_secret.json'
     GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = client_json_path
-    #
-    # fileToDrive = app.config['UPLOAD_FOLDER'] + filename
-    # print(fileToDrive)
-    # file = drive.CreateFile({'parents': [{'id': "1oNuqmcxNPctnHNC_BjgJnoXM8p2Ykuqz"}]})
-    # # Read file and set it as the content of this instance.
-    # file.SetContentFile(fileToDrive)
-    # file.Upload()  # Upload the file.
 
     auth = GoogleAuth()
     # Try to load saved client credentials
@@ -148,7 +140,7 @@ def drive_upload(filename):
         # Refresh them if expired
         auth.Refresh()
     else:
-        # Initialize the saved creds
+        # Initialize the saved credentials
         auth.Authorize()
     # Save the current credentials to a file
     auth.SaveCredentialsFile(app.config['UPLOAD_FOLDER'] + "mycreds.txt")
@@ -178,7 +170,7 @@ def upload_file():
                 f.write(str(request.form.get('data')))
                 f.close()
 
-            drive_upload(filename)
+            # drive_upload(filename)
             return '''
             <!doctype html>
             <title>Upload new File</title>
