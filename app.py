@@ -1,14 +1,11 @@
 import glob
-import os
+import os, boto3
 from os.path import basename
 from zipfile import ZipFile
 
 from flask import Flask, render_template, send_from_directory, flash, request, redirect, url_for
 from flask_cors import CORS
 from werkzeug.utils import secure_filename
-
-from pydrive.auth import GoogleAuth
-from pydrive.drive import GoogleDrive
 
 import time
 
@@ -43,12 +40,6 @@ def delete():
 @app.route("/unity", methods=["POST"])
 def unity():
     if request.method == "POST":
-
-        auth = GoogleAuth()
-        drive = GoogleDrive(auth)
-        client_json_path = 'static/client_secrets.json'
-        GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = client_json_path
-
         form = request.form
         # FileStorage object wrapper
         print(form)
@@ -61,10 +52,6 @@ def unity():
 
         fileToDrive = app.config['UPLOAD_FOLDER'] + filename
         print(fileToDrive)
-        file = drive.CreateFile({'parents': [{'id': "1oNuqmcxNPctnHNC_BjgJnoXM8p2Ykuqz"}]})
-        # Read file and set it as the content of this instance.
-        file.SetContentFile(fileToDrive)
-        file.Upload()  # Upload the file.
 
         return "Access-Control-Allow-Origin: *"
 
@@ -107,52 +94,26 @@ def make_tree(path):
     return tree
 
 
-# create a ZipFile object
-@app.route('/downloadzip/<path:filename>', methods=['GET', 'POST'])
-def downloadzip(path):
-    with ZipFile('sampleDir.zip', 'w') as zipObj:
-        # Iterate over all the files in directory
-        for folderName, subfolders, filenames in os.walk(path):
-            for filename in filenames:
-                # create complete filepath of file in directory
-                filePath = os.path.join(folderName, filename)
-                # Add file to zip
-                zipObj.write(filePath, basename(filePath))
-
-
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
-def drive_upload(filename):
+def s3_upload_files(f, bucket_name, filename):
 
-    client_json_path = 'static/client_secret.json'
-    GoogleAuth.DEFAULT_SETTINGS['client_config_file'] = client_json_path
+    S3_BUCKET = os.environ.get('S3_BUCKET')
+    s3 = boto3.client('s3')
+    # Creating S3 Resource From the Session.
+    # s3 = session.resource('s3')
 
-    auth = GoogleAuth()
-    # Try to load saved client credentials
-    auth.LoadCredentialsFile(app.config['UPLOAD_FOLDER'] + "mycreds.txt")
-    if auth.credentials is None:
-        # Authenticate if they're not there
-        auth.LocalWebserverAuth()
-    elif auth.access_token_expired:
-        # Refresh them if expired
-        auth.Refresh()
+    result = s3.meta.client.put_object(Body=f, Bucket=S3_BUCKET, Key=filename)
+
+    res = result.get('ResponseMetadata')
+
+    if res.get('HTTPStatusCode') == 200:
+        print('File Uploaded Successfully')
     else:
-        # Initialize the saved credentials
-        auth.Authorize()
-    # Save the current credentials to a file
-    auth.SaveCredentialsFile(app.config['UPLOAD_FOLDER'] + "mycreds.txt")
-
-    drive = GoogleDrive(auth)
-
-    fileToDrive = app.config['UPLOAD_FOLDER'] + filename
-    print(fileToDrive)
-    file = drive.CreateFile({'parents': [{'id': "1oNuqmcxNPctnHNC_BjgJnoXM8p2Ykuqz"}]})
-    # Read file and set it as the content of this instance.
-    file.SetContentFile(fileToDrive)
-    file.Upload()  # Upload the file.
+        print('File Not Uploaded')
 
 
 @app.route('/upload', methods=['GET', 'POST'])
@@ -169,6 +130,7 @@ def upload_file():
             with open(app.config['UPLOAD_FOLDER'] + filename, 'w') as f:
                 f.write(str(request.form.get('data')))
                 f.close()
+                s3_upload_files(str(request.form.get('data')), "unityflaskwebapp", filename)
 
             # drive_upload(filename)
             return '''
@@ -203,7 +165,18 @@ def upload_file():
     '''
 
 
+def s3_upload_small_files(inp_file_name, s3_bucket_name, inp_file_key, content_type):
+    client = s3_client()
+    upload_file_response = client.put_object(Body=inp_file_name,
+                                             Bucket=s3_bucket_name,
+                                             Key=inp_file_key,
+                                             ContentType=content_type)
+    print(f" ** Response - {upload_file_response}")
+
+
 if __name__ == "__main__":
-    app.secret_key = 'super secret key'
-    app.config['SESSION_TYPE'] = 'filesystem'
-    app.run(debug=True)
+    # app.config['SESSION_TYPE'] = 'filesystem'
+    # app.run(debug=True)
+
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port)
